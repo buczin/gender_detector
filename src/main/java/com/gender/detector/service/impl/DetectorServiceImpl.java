@@ -3,12 +3,9 @@ package com.gender.detector.service.impl;
 import com.gender.detector.exceptions.GuessMethodNotExistsException;
 import com.gender.detector.exceptions.ParameterValidationException;
 import com.gender.detector.service.DetectorService;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class DetectorServiceImpl implements DetectorService {
+public final class DetectorServiceImpl implements DetectorService {
 
     @Override
     public List<String> getAllByGender(String gender) {
@@ -114,8 +111,8 @@ public class DetectorServiceImpl implements DetectorService {
         return new BufferedReader(new InputStreamReader(getInputStreamOfGender(gender))).lines().collect(Collectors.toList());
     }
 
-    private InputStream getInputStreamOfGender(String gender){
-        return getClass().getClassLoader().getResourceAsStream("names\\"+gender+".txt");
+    private InputStream getInputStreamOfGender(String gender) {
+        return getClass().getClassLoader().getResourceAsStream("names\\" + gender + ".txt");
 
 //        InputStream is = null;
 //        Resource resource = new ClassPathResource("classpath:names/" + gender + ".txt");
