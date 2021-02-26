@@ -1,6 +1,6 @@
 package com.gender.detector.service.impl;
 
-import com.gender.detector.exceptions.GuessMethodNotExists;
+import com.gender.detector.exceptions.GuessMethodNotExistsException;
 import com.gender.detector.exceptions.ParameterValidationException;
 import com.gender.detector.service.DetectorService;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,7 @@ public class DetectorServiceImpl implements DetectorService {
     public List<String> getAllByGender(String gender) {
         if (gender.equalsIgnoreCase("MALE")) {
             return getFileContent("male");
-        }
-        else if (gender.equalsIgnoreCase("FEMALE")) {
+        } else if (gender.equalsIgnoreCase("FEMALE")) {
             return getFileContent("female");
         }
         throw new ParameterValidationException();
@@ -32,7 +31,7 @@ public class DetectorServiceImpl implements DetectorService {
         validateToken(token);
         if (method == 1) return onlyFirstTokenCheck(token.toUpperCase());
         if (method == 2) return allTokensCheck(token.toUpperCase());
-        throw new GuessMethodNotExists();
+        throw new GuessMethodNotExistsException();
     }
 
     @Override
@@ -111,8 +110,8 @@ public class DetectorServiceImpl implements DetectorService {
         return gender;
     }
 
-    private List<String> getFileContent(String gender){
-        InputStream isMale = getClass().getClassLoader().getResourceAsStream("names\\"+gender+".txt");
+    private List<String> getFileContent(String gender) {
+        InputStream isMale = getClass().getClassLoader().getResourceAsStream("names\\" + gender + ".txt");
         return new BufferedReader(new InputStreamReader(isMale)).lines().collect(Collectors.toList());
     }
 
