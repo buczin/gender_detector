@@ -3,9 +3,12 @@ package com.gender.detector.service.impl;
 import com.gender.detector.exceptions.GuessMethodNotExistsException;
 import com.gender.detector.exceptions.ParameterValidationException;
 import com.gender.detector.service.DetectorService;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -48,8 +51,8 @@ public class DetectorServiceImpl implements DetectorService {
         List<String> genderList = new ArrayList<>();
 
         // Add to the list all detected genders from the input token
-        for (int i = 0; i < arrayToken.length; i++) {
-            genderList.add(searchInFile(arrayToken[i]));
+        for (String s : arrayToken) {
+            genderList.add(searchInFile(s));
         }
 
         // Counting the genders identified from the token
@@ -67,7 +70,7 @@ public class DetectorServiceImpl implements DetectorService {
         if (counted.size() > 1) {
             Map.Entry<String, Long> n1 = it.next();
             Map.Entry<String, Long> n2 = it.next();
-            if (n1.getValue() == n2.getValue()) {
+            if (n1.getValue().equals(n2.getValue())) {
                 return "INCONCLUSIVE";
             } else {
                 return n1.getKey();
@@ -82,9 +85,8 @@ public class DetectorServiceImpl implements DetectorService {
         String gender = "INCONCLUSIVE";
         boolean found = false;
 
-        InputStream isMale = getClass().getClassLoader().getResourceAsStream("names\\male.txt");
-        Scanner scMale = new Scanner(isMale, StandardCharsets.UTF_8);
 
+        Scanner scMale = new Scanner(getInputStreamOfGender("male"), StandardCharsets.UTF_8);
         while (scMale.hasNextLine()) {
             String line = scMale.nextLine();
             if (line.toUpperCase().matches(token)) {
@@ -95,9 +97,7 @@ public class DetectorServiceImpl implements DetectorService {
         }
 
         if (!found) {
-            InputStream isFemale = getClass().getClassLoader().getResourceAsStream("names\\female.txt");
-            Scanner scFemale = new Scanner(isFemale, StandardCharsets.UTF_8);
-
+            Scanner scFemale = new Scanner(getInputStreamOfGender("female"), StandardCharsets.UTF_8);
             while (scFemale.hasNextLine()) {
                 String line = scFemale.nextLine();
                 if (line.toUpperCase().matches(token)) {
@@ -111,8 +111,20 @@ public class DetectorServiceImpl implements DetectorService {
     }
 
     private List<String> getFileContent(String gender) {
-        InputStream isMale = getClass().getClassLoader().getResourceAsStream("names\\" + gender + ".txt");
-        return new BufferedReader(new InputStreamReader(isMale)).lines().collect(Collectors.toList());
+        return new BufferedReader(new InputStreamReader(getInputStreamOfGender(gender))).lines().collect(Collectors.toList());
+    }
+
+    private InputStream getInputStreamOfGender(String gender){
+        return getClass().getClassLoader().getResourceAsStream("names\\"+gender+".txt");
+
+//        InputStream is = null;
+//        Resource resource = new ClassPathResource("classpath:names/" + gender + ".txt");
+//        try {
+//            is = resource.getInputStream();
+//        } catch (IOException ex) {
+//            System.out.println(ex);
+//        }
+//        return is;
     }
 
     private void validateToken(String token) {
