@@ -3,9 +3,12 @@ package com.gender.detector.service.impl;
 import com.gender.detector.exceptions.GuessMethodNotExistsException;
 import com.gender.detector.exceptions.ParameterValidationException;
 import com.gender.detector.service.DetectorService;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -112,16 +115,19 @@ public final class DetectorServiceImpl implements DetectorService {
     }
 
     private InputStream getInputStreamOfGender(String gender) {
-        return getClass().getClassLoader().getResourceAsStream("names\\" + gender + ".txt");
-
-//        InputStream is = null;
-//        Resource resource = new ClassPathResource("classpath:names/" + gender + ".txt");
-//        try {
-//            is = resource.getInputStream();
-//        } catch (IOException ex) {
-//            System.out.println(ex);
-//        }
-//        return is;
+        InputStream is = null;
+        is = DetectorServiceImpl.class.getClassLoader().getResourceAsStream("names\\" + gender + ".txt");
+        if (is == null) {
+            Resource resource = new ClassPathResource("classpath:names/" + gender + ".txt");
+            try {
+                is = resource.getInputStream();
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+            return is;
+        } else {
+            return is;
+        }
     }
 
     private void validateToken(String token) {
